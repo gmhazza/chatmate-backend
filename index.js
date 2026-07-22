@@ -2,6 +2,12 @@ const express = require('express');
 const http = require('http');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const dns = require('dns');
+
+dns.setServers(['1.1.1.1', '8.8.8.8']);
+
+const { connectDB } = require('./database/mongodb');
+const databaseRouter = require('./api/database')
 
 const app = express();
 
@@ -10,16 +16,20 @@ dotenv.config();
 
 const PORT = process.env.PORT || 3000
 
+app.use(express.json());
 app.use(cors({
-    origin: 'http:localhost:5173'
+    origin: process.env.FRONTEND_URL
 }));
 
 
-app.get('/', (req, res) => {
-    res.status(200).json({
-        message: 'successful'
-    });
+
+connectDB().then(() => {
+    console.log(`MongoDB connected successfully`);
+}).catch((error) => {
+    console.error(error);
 });
+
+app.use('/api/database', databaseRouter);
 
 server.listen(PORT, () => {
     console.log(`Server running at ${PORT}`);
