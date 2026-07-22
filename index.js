@@ -9,6 +9,7 @@ dns.setServers(['1.1.1.1', '8.8.8.8']);
 
 const { connectDB } = require('./database/mongodb');
 const databaseRouter = require('./api/database')
+const chatbotRouter = require('./api/chatbot')
 
 const app = express();
 
@@ -34,6 +35,7 @@ connectDB().then(() => {
 });
 
 app.use('/api/database', databaseRouter);
+app.use('/api/chatbot', chatbotRouter);
 
 server.listen(PORT, () => {
     console.log(`Server running at ${PORT}`);

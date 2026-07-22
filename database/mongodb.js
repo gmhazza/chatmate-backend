@@ -53,7 +53,6 @@ const message = mongoose.model('message', messageSchema);
 
 const connectDB = async () => {
     try {
-        console.log(process.env.MONGODB_URL)
         await mongoose.connect(process.env.MONGODB_URL, {
             dbName: "chatmate"
         });
