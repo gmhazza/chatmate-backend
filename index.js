@@ -3,6 +3,7 @@ const http = require('http');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const dns = require('dns');
+const cookieParser = require('cookie-parser')
 
 dns.setServers(['1.1.1.1', '8.8.8.8']);
 
@@ -17,8 +18,11 @@ dotenv.config();
 const PORT = process.env.PORT || 3000
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors({
-    origin: process.env.FRONTEND_URL
+  origin: 'http://localhost:5173',
+  credentials: true,
+  methods: ['GET', 'POST', 'PATCH', 'DELETE']
 }));
 
 
