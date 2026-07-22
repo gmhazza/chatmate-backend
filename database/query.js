@@ -18,7 +18,7 @@ const createUser = async (name, email, password) => {
 
 const login = async (email, password) => {
     try {
-        const results = await user.findOne({ email: email}).select('name email password');
+        const results = await user.findOne({ email: email }).select('name email password');
         if(!results) throw new Error('Incorrect Email');
         if(bycrpt.compare(password, results.password)) return results;
         else throw new Error('Incorrect Password');
@@ -119,5 +119,5 @@ const deleteConversation = async (conversation_id) => {
 
 
 module.exports = {
-    createUser, findAllUser, login, findUserByID, deleteUser
+    createUser, findAllUser, login, findUserByID, deleteUser, findAllConversations
 };

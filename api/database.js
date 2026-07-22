@@ -1,5 +1,5 @@
 const express = require('express');
-const { createUser, findAllUser, findUserByID, login, deleteUser } = require('../database/query');
+const { createUser, findAllUser, findUserByID, login, deleteUser, findAllConversations } = require('../database/query');
 const { jwt, authenticate, checkAuthentication } = require('../middleware/jwt');
 
 const router = express.Router();
@@ -32,15 +32,15 @@ router.post('/login', async (req, res) => {
         const { email, password } = req.body;
         const results = await login(email, password);
         const token = jwt.sign({
-                _id: results._id, name: results.name
-            }, process.env.SECRET_KEY, {
-                expiresIn: "7d"
-            })
-            res.cookie("token", token, {
-                httpOnly: true,
-                sameSite: "strict",
-                maxAge: 7 * 24 * 60 * 60 * 1000
-            });
+            _id: results._id, name: results.name
+        }, process.env.SECRET_KEY, {
+            expiresIn: "7d"
+        })
+        res.cookie("token", token, {
+            httpOnly: true,
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
         res.status(200).json(results);
     } catch (error) {
         res.status(409).json({
@@ -50,28 +50,6 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.post('/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const results = await login(email, password);
-        const token = jwt.sign({
-                _id: results._id, name: results.name
-            }, process.env.SECRET_KEY, {
-                expiresIn: "7d"
-            })
-            res.cookie("token", token, {
-                httpOnly: true,
-                sameSite: "strict",
-                maxAge: 7 * 24 * 60 * 60 * 1000
-            });
-        res.status(200).json(results);
-    } catch (error) {
-        res.status(409).json({
-            message: error.message
-        })
-        throw error;
-    }
-});
 
 router.get('/logout', authenticate, async (req, res) => {
     try {
@@ -113,6 +91,19 @@ router.delete('/delete/profile', authenticate, async (req, res) => {
 router.get('/get/all/user', authenticate, async (req, res) => {
     try {
         const results = await findAllUser();
+        res.status(200).json(results);
+    } catch (error) {
+        res.status(409).json({
+            message: error.message
+        })
+        throw error;
+    }
+});
+
+router.get('/get/user/conversations', authenticate, async (req, res) => {
+    try {
+        const user_id = req.user._id;
+        const results = await findAllConversations(user_id);
         res.status(200).json(results);
     } catch (error) {
         res.status(409).json({
