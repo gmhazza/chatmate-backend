@@ -82,6 +82,21 @@ const sendMessage = async (message, conversation_id, sender) => {
     }
 };
 
+const updateConversationTitle = async (conversation_id, title) => {
+    try {
+        const results = await conversation.findByIdAndUpdate(coversation_id, {
+                title: title
+            },
+            {
+                new: true
+            }
+        );
+        return results;
+    } catch (error) {
+        throw error;
+    }
+};
+
 const deleteUser = async (_id) => {
     try {
         const results = await user.findByIdAndDelete(_id);
