@@ -1,6 +1,7 @@
 const { user, conversation, message } = require('./mongodb');
 const bycrpt = require('bcrypt');
 
+
 const createUser = async (name, email, password) => {
     try {
         const hash = await bycrpt.hash(password, 10);
@@ -45,10 +46,56 @@ const findUserByID = async (_id) => {
     }
 };
 
+const findAllConversations = async (_id) => {
+    try {
+        const results = await conversation.find({user_id: _id}).select('_id title createdAt');
+        return results;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const findAllMessagesOfConversation = async (coversation_id) => {
+    try {
+        const results = await message.find({coversation_id: coversation_id}).select('_id content sender createdAt');
+        return results;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const createNewConversation = async (title, user_id) => {
+    try {
+        const results = await conversation.create({title: title, user_id: user_id});
+        return results;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const sendMessage = async (message, conversation_id, sender) => {
+    try {
+        const results = await message.create({conversation_id: conversation_id, content: message, sender: sender});
+        return results;
+    } catch (error) {
+        throw error;
+    }
+};
+
 const deleteUser = async (_id) => {
     try {
         const results = await user.findByIdAndDelete(_id);
         if (!results) throw new Error('User not Found');
+        return results;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const deleteConversation = async (conversation_id) => {
+    try {
+        const results = await conversation.findByIdAndDelete(conversation_id);
+        if (!results) throw new Error('Conversation not Found');
         return results;
     } catch (error) {
         throw error;
