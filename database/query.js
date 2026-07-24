@@ -2,13 +2,14 @@ const { user, conversation, message } = require('./mongodb');
 const bycrpt = require('bcrypt');
 
 
-const createUser = async (name, email, password) => {
+const createUser = async (name, email, password, gender) => {
     try {
         const hash = await bycrpt.hash(password, 10);
         const results = await user.create({
             name: name,
             email: email,
-            password: hash
+            password: hash,
+            gender: gender
         });
         return results;
     } catch (error) {
@@ -18,7 +19,7 @@ const createUser = async (name, email, password) => {
 
 const login = async (email, password) => {
     try {
-        const results = await user.findOne({ email: email }).select('name email password');
+        const results = await user.findOne({ email: email }).select('avatar _id name email password');
         if(!results) throw new Error('Incorrect Email');
         if(bycrpt.compare(password, results.password)) return results;
         else throw new Error('Incorrect Password');
@@ -39,7 +40,7 @@ const findAllUser = async () => {
 
 const findUserByID = async (_id) => {
     try {
-        const results = await user.findById(_id).select('_id name email');
+        const results = await user.findById(_id).select('_id avatar name email gender');
         return results;
     } catch (error) {
         throw error;
@@ -55,16 +56,16 @@ const findAllConversations = async (_id) => {
     }
 };
 
-const findAllMessagesOfConversation = async (coversation_id) => {
+const findAllMessagesOfConversation = async (_id) => {
     try {
-        const results = await message.find({coversation_id: coversation_id}).select('_id content sender createdAt');
+        const results = await message.find({conversation_id: _id}).select('_id content sender createdAt').lean();
         return results;
     } catch (error) {
         throw error;
     }
 };
 
-const createNewConversation = async (title, user_id) => {
+const CreateNewConversation = async (user_id, title) => {
     try {
         const results = await conversation.create({title: title, user_id: user_id});
         return results;
@@ -73,9 +74,9 @@ const createNewConversation = async (title, user_id) => {
     }
 };
 
-const sendMessage = async (message, conversation_id, sender) => {
+const SendMessage = async (msg, conversation_id, sender) => {
     try {
-        const results = await message.create({conversation_id: conversation_id, content: message, sender: sender});
+        const results = await message.create({conversation_id: conversation_id, content: msg, sender: sender});
         return results;
     } catch (error) {
         throw error;
@@ -117,7 +118,32 @@ const deleteConversation = async (conversation_id) => {
     }
 };
 
+const UpdateConversationTitle = async (conversation_id, title) => {
+    try {
+        const updatedConversation = await conversation.findOneAndUpdate(
+            { _id: conversation_id },
+            { $set: { title: title } },
+            { new: true, runValidators: true }
+        );
+        if (!updatedConversation) throw new Error('Conversation not Found');
+        return updatedConversation;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const DeleteConversation = async (conversation_id) => {
+        try {
+        const updatedConversation = await conversation.findOneAndDelete({ _id: conversation_id });
+        if (!updatedConversation) throw new Error('Conversation not Found');
+        return updatedConversation;
+    } catch (error) {
+        throw error;
+    }
+};
+
 
 module.exports = {
-    createUser, findAllUser, login, findUserByID, deleteUser, findAllConversations
+    createUser, findAllUser, login, findUserByID, deleteUser, findAllConversations, CreateNewConversation, findAllMessagesOfConversation,
+    SendMessage, UpdateConversationTitle, DeleteConversation
 };

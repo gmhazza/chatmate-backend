@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
+    avatar: {
+        type: String,
+        default: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0k6mJECkDvvxLWpl2C6oVOgbs49inNcoZtvJRFileqS3TAkNr3qOH87dG&s=10"
+    },
     name: {
         type: String,
         required: true,
@@ -12,6 +16,10 @@ const userSchema = new mongoose.Schema({
         unique: true
     },
     password: {
+        type: String,
+        required: true
+    },
+    gender: {
         type: String,
         required: true
     }
@@ -41,7 +49,7 @@ const messageSchema = new mongoose.Schema({
     },
     sender: {
         type: String,
-        required: true
+        default: 'bot'
     },
     content: {
         type: String,
