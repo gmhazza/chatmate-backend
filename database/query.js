@@ -142,8 +142,28 @@ const DeleteConversation = async (conversation_id) => {
     }
 };
 
+const updateProfile = async (Updatedprofile) => {
+    try {
+        const hash = await bycrpt.hash(updateProfile.password, 10);
+        const result = await user.findOneAndUpdate(
+            { _id: updateProfile._id },
+            { $set: {
+                    name: updateProfile.name,
+                    gender: Updatedprofile.gender
+                }
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+    } catch (error) {
+        
+    }
+}
+
 
 module.exports = {
     createUser, findAllUser, login, findUserByID, deleteUser, findAllConversations, CreateNewConversation, findAllMessagesOfConversation,
-    SendMessage, UpdateConversationTitle, DeleteConversation
+    SendMessage, UpdateConversationTitle, DeleteConversation, updateProfile
 };

@@ -1,8 +1,9 @@
 const express = require('express');
 const { createUser, findAllUser, findUserByID, login, deleteUser, findAllConversations, CreateNewConversation,
-    findAllMessagesOfConversation, SendMessage, UpdateConversationTitle, DeleteConversation
+    findAllMessagesOfConversation, SendMessage, UpdateConversationTitle, DeleteConversation, updateProfile
  } = require('../database/query');
 const { jwt, authenticate, checkAuthentication } = require('../middleware/jwt');
+const { user } = require('../database/mongodb');
 
 const router = express.Router();
 
@@ -14,12 +15,12 @@ router.post('/register/user', async (req, res) => {
                 _id: results._id, name: results.name, avatar: results.avatar, email: results.email
             }, process.env.SECRET_KEY, {
                 expiresIn: "7d"
-            })
-            res.cookie("token", token, {
+        });
+        res.cookie("token", token, {
                 httpOnly: true,
                 sameSite: "strict",
                 maxAge: 7 * 24 * 60 * 60 * 1000
-            });
+        });
         res.status(200).json(results);
     } catch (error) {
         res.status(409).json({
@@ -186,7 +187,37 @@ router.post('/update/conversation/title', authenticate, async (req, res) => {
 router.post('/delete/conversation', authenticate, async (req, res) => {
     try {
         const results = await DeleteConversation(req.body.conversation_id);
-        console.log(results)
+        res.status(200).json(results);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+
+router.post('/update/profile', authenticate, async (req, res) => {
+    try {
+        const results = await updateProfile({
+            _id: req.user._id,
+            name: req.body.name,
+            password: req.body.password,
+            gender: req.body.gender,
+        });
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax"
+        });
+        const token = jwt.sign({
+            _id: results._id, name: results.name, avatar: results.avatar, email: results.email
+        }, process.env.SECRET_KEY, {
+            expiresIn: "7d"
+        });
+        res.cookie("token", token, {
+            httpOnly: true,
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
         res.status(200).json(results);
     } catch (error) {
         res.status(500).json({

@@ -5,6 +5,8 @@ const dotenv = require('dotenv');
 const dns = require('dns');
 const cookieParser = require('cookie-parser');
 
+dotenv.config();
+
 dns.setServers(['1.1.1.1', '8.8.8.8']);
 
 const { connectDB } = require('./database/mongodb');
@@ -14,30 +16,29 @@ const chatbotRouter = require('./api/chatbot');
 const app = express();
 
 const server = http.createServer(app);
-dotenv.config();
 
 const PORT = process.env.PORT;
+const FRONTEND_URL = (process.env.FRONTEND_URL || '').replace(/\/$/, '');
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: `${process.env.FRONTEND_URL}`,
+  origin: FRONTEND_URL,
   credentials: true,
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
-
-
-connectDB().then(() => {
-    console.log(`MongoDB connected successfully`);
-}).catch((error) => {
-    console.error(error);
-});
 
 app.use('/api/database', databaseRouter);
 app.use('/api/chatbot', chatbotRouter);
 
-server.listen(PORT, () => {
-    console.log(`Server running at ${PORT}`);
+connectDB().then(() => {
+    console.log(`MongoDB connected successfully`);
+    server.listen(PORT, () => {
+        console.log(`Server running at ${PORT}`);
+    });
+}).catch((error) => {
+    console.error(error);
+    process.exit(1);
 });
+
