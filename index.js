@@ -18,7 +18,7 @@ const app = express();
 const server = http.createServer(app);
 
 const PORT = process.env.PORT;
-const FRONTEND_URL = (process.env.FRONTEND_URL || '').replace(/\/$/, '');
+const FRONTEND_URL = (process.env.FRONTEND_URL || 'https://chatmate-fun.vercel.app').replace(/\/$/, '');
 
 app.use(express.json());
 app.use(cookieParser());
@@ -31,6 +31,13 @@ app.use(cors({
 
 app.use('/api/database', databaseRouter);
 app.use('/api/chatbot', chatbotRouter);
+
+app.get('/', (req, res) => {
+    res.status(200).json({
+        status: 'Successful',
+        message: 'Server is connected'
+    })
+});
 
 connectDB().then(() => {
     console.log(`MongoDB connected successfully`);
