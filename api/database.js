@@ -60,8 +60,8 @@ router.get('/logout', authenticate, async (req, res) => {
     try {
         res.clearCookie("token", {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax"
+            secure: true,
+            sameSite: "none"
         });
         res.status(200).json({
             message: 'successfull logout'
@@ -79,8 +79,8 @@ router.get('/delete/profile', authenticate, async (req, res) => {
         const results = await deleteUser(req.user._id);
         res.clearCookie("token", {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax"
+            secure: true,
+            sameSite: "none"
         });
         res.status(200).json({
             message: 'successfull delete and logout'
