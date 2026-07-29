@@ -58,7 +58,7 @@ router.post('/login', async (req, res) => {
 });
 
 
-router.get('/logout', authenticate, async (req, res) => {
+router.post('/logout', authenticate, async (req, res) => {
     try {
         res.clearCookie("token", {
             httpOnly: true,
