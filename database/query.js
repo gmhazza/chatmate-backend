@@ -162,8 +162,18 @@ const updateProfile = async (Updatedprofile) => {
     }
 }
 
+const FetchPreviousMessages = async (conversation_id, limit) => {
+    try {
+        const messages = await message.find({ conversation_id: conversation_id }).select('_id content sender createdAt').sort({ _id: -1 }).limit(limit).lean();
+        const results = messages.reverse();
+        return results;
+    } catch (error) {
+        throw error;
+    }
+};
+
 
 module.exports = {
     createUser, findAllUser, login, findUserByID, deleteUser, findAllConversations, CreateNewConversation, findAllMessagesOfConversation,
-    SendMessage, UpdateConversationTitle, DeleteConversation, updateProfile
+    SendMessage, UpdateConversationTitle, DeleteConversation, updateProfile, FetchPreviousMessages
 };
