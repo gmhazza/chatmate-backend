@@ -108,16 +108,6 @@ const deleteUser = async (_id) => {
     }
 };
 
-const deleteConversation = async (conversation_id) => {
-    try {
-        const results = await conversation.findByIdAndDelete(conversation_id);
-        if (!results) throw new Error('Conversation not Found');
-        return results;
-    } catch (error) {
-        throw error;
-    }
-};
-
 const UpdateConversationTitle = async (conversation_id, title) => {
     try {
         const updatedConversation = await conversation.findOneAndUpdate(
@@ -136,6 +126,7 @@ const DeleteConversation = async (conversation_id) => {
         try {
         const updatedConversation = await conversation.findOneAndDelete({ _id: conversation_id });
         if (!updatedConversation) throw new Error('Conversation not Found');
+        await DeleteMessagesByConversationId(conversation_id);
         return updatedConversation;
     } catch (error) {
         throw error;
@@ -158,7 +149,16 @@ const updateProfile = async (Updatedprofile) => {
             }
         );
     } catch (error) {
-        
+        throw error;
+    }
+}
+
+const DeleteMessagesByConversationId = async (conversation_id) => {
+    try {
+        const result = await message.deleteMany({ conversation_id: conversation_id });
+        return result;
+    } catch (error) {
+        throw error;
     }
 }
 
